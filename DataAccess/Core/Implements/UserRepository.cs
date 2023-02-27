@@ -5,6 +5,7 @@ using Common.Utilities.Response;
 using Common.Utilities.Services;
 using DataAccess.Core.Contract;
 using DataAccess.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -25,18 +26,18 @@ namespace DataAccess.Core.Implements
         private readonly VentaRealContext context;
         private readonly ILogger<UserRepository> _logger;
         private readonly IMapper _mapper;
-        private readonly AppSettings _appSettings;
+        private readonly IConfiguration _config;
         #endregion
 
         #region Contructor
         public UserRepository(VentaRealContext context, 
             ILogger<UserRepository> logger, IMapper mapper,
-            IOptions<AppSettings> options)
+            IConfiguration config)
         {
             this.context = context;
             _logger = logger;
             _mapper = mapper;
-            _appSettings = options.Value;
+            _config = config;
         }
         #endregion
 
@@ -53,30 +54,28 @@ namespace DataAccess.Core.Implements
             response.Email = usuario.Email;
             response.Token = GetToken(usuario);
 
-
             return response;
         }
 
         private string GetToken(Usuario model)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var llave = Encoding.ASCII.GetBytes(_appSettings.Secreto);
-            var tokenDescriptor = new SecurityTokenDescriptor
+        {   
+            string secret = _config.GetSection("Secret").Value;            
+            
+            var claims = new ClaimsIdentity();
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, model.Nombre));
+            claims.AddClaim(new Claim(ClaimTypes.Email, model.Email));
+
+            var tokenDescription = new SecurityTokenDescriptor()
             {
-                Subject = new ClaimsIdentity(
-                    new Claim[]
-                    {
-                        new Claim(ClaimTypes.NameIdentifier,model.Id.ToString()),
-                        new Claim(ClaimTypes.Email,model.Email)
-                    }
-                    ),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(llave), SecurityAlgorithms.HmacSha256Signature)
+                Subject = claims,
+                Expires = DateTime.UtcNow.AddHours(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret)), SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var createdToken = tokenHandler.CreateToken(tokenDescription);
 
-            return tokenHandler.WriteToken(token);
+            return tokenHandler.WriteToken(createdToken);
         }
     }
 }

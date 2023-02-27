@@ -43,35 +43,11 @@ namespace WSVenta
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WSVenta", Version = "v1" });
-                //c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                //{
-                //    Scheme = "Bearer",
-                //    BearerFormat = "JWT",
-                //    In = ParameterLocation.Header,
-                //    Name = "Authorization",
-                //    Description = "Bearer Authentication with JWT Token",
-                //    Type = SecuritySchemeType.Http
-                //});
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                //{
-                //    {
-                //        new OpenApiSecurityScheme
-                //        {
-                //            Reference = new OpenApiReference
-                //            {
-                //                Id = "Bearer",
-                //                Type = ReferenceType.SecurityScheme
-                //            }
-                //        },
-                //        new List<string>()
-                //    }
-                //});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WSVenta", Version = "v1" });                
             });
 
             //jwt
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var llave = Encoding.ASCII.GetBytes(appSettings.Secreto);
+            string secretKey = this.Configuration.GetValue<string>("Secret");
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -83,7 +59,7 @@ namespace WSVenta
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(llave),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };                
@@ -108,6 +84,8 @@ namespace WSVenta
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseCors(x => x
@@ -115,9 +93,6 @@ namespace WSVenta
                .AllowAnyHeader()
                .SetIsOriginAllowed(origin => true) // allow any origin
                .AllowCredentials());
-            
-            app.UseAuthentication();
-
 
             app.UseEndpoints(endpoints =>
             {
