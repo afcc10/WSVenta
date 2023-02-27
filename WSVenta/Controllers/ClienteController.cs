@@ -1,5 +1,6 @@
 ﻿using Business.Contract;
 using Common.Utilities.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ namespace WSVenta.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class ClienteController : ControllerBase
     {
         #region Propierties
@@ -85,13 +87,13 @@ namespace WSVenta.Controllers
             }
         }
 
-        [HttpDelete]
-        public async Task<Response> DeleteCliente(int idCliente)
+        [HttpDelete("{id}")]
+        public async Task<Response> DeleteCliente(int id)
         {
             Response response = new();
             try
             {
-                response = await Service.DeleteCliente(idCliente);
+                response = await Service.DeleteCliente(id);
                 return response;
             }
             catch (Exception ex)
