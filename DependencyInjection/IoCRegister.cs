@@ -16,6 +16,7 @@ namespace DependencyInjection
         {
             services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IVentaRepository, VentaRepository>();
             return services;
         }
 
@@ -23,6 +24,7 @@ namespace DependencyInjection
         {
             services.AddScoped<IClienteServices, ClienteServices>();
             services.AddScoped<IUserServices, UserServices>();
+            services.AddScoped<IVentaServices, VentaServices>();
             services.AddAutoMapper(typeof(ClienteProfileMap));
 
             return services;
