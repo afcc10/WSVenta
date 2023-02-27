@@ -10,6 +10,7 @@ using System.Net;
 using System;
 using System.Threading.Tasks;
 using WSVenta.Models;
+using System.Linq;
 
 namespace DataAccess.Core.Implements
 {
@@ -36,35 +37,48 @@ namespace DataAccess.Core.Implements
             Response response = new();
             try
             {
-                Venta venta = new()
+                using (var transaction = context.Database.BeginTransaction()) 
                 {
-                    IdCliente = ventaRequest.IdCliente,
-                    Total = ventaRequest.Total,
-                    Fecha = DateTime.UtcNow,
-                };
-
-                context.Add(venta);
-                context.SaveChanges();
-
-                foreach (var item in ventaRequest.conceptos)
-                {
-                    WSVenta.Models.Concepto concepto1 = new()
+                    try
                     {
-                        Cantidad = item.Cantidad,
-                        IdProducto = item.Idproducto,
-                        PrecioUnitario = item.PrecioUnitario,
-                        IdVenta = venta.Id                        
-                    };
-                    context.Add(concepto1);
-                    await context.SaveChangesAsync();
-                }
+                        Venta venta = new()
+                        {
+                            IdCliente = ventaRequest.IdCliente,
+                            Total = ventaRequest.conceptos.Sum(x => x.Cantidad * x.PrecioUnitario),
+                            Fecha = DateTime.UtcNow,
+                        };
 
-                response = new()
-                {
-                    Exito = (int)HttpStatusCode.OK,
-                    Data = null,
-                    Mensaje = Message_es.CreateSucces
-                };
+                        context.Add(venta);
+                        context.SaveChanges();
+
+                        foreach (var item in ventaRequest.conceptos)
+                        {
+                            WSVenta.Models.Concepto concepto1 = new()
+                            {
+                                Cantidad = item.Cantidad,
+                                IdProducto = item.Idproducto,
+                                PrecioUnitario = item.PrecioUnitario,
+                                IdVenta = venta.Id
+                            };
+                            context.Add(concepto1);
+                            await context.SaveChangesAsync();
+                        }
+
+                        transaction.Commit();
+
+                        response = new()
+                        {
+                            Exito = (int)HttpStatusCode.OK,
+                            Data = null,
+                            Mensaje = Message_es.CreateSucces
+                        };
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                    }
+                    
+                }
 
                 return await Task.FromResult(response);
             }

@@ -13,8 +13,7 @@ namespace Models.Request
             this.conceptos = new List<Concepto>();
         }
 
-        public int IdCliente { get; set; }
-        public decimal Total { get; set; }
+        public int IdCliente { get; set; }        
         public List<Concepto> conceptos { get; set; }
     }
 
