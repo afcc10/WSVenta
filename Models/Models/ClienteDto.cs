@@ -9,6 +9,7 @@ namespace Models.Models
     public class ClienteDto
     {
         public long Id { get; set; }
-        public string Nombre { get; set; }        
+        public string Nombre { get; set; }
+        public int Edad { get; set; }
     }
 }

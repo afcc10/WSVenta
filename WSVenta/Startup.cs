@@ -1,4 +1,5 @@
 using Common;
+using Common.Helpers;
 using DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +34,11 @@ namespace WSVenta
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(option =>
+            {
+               // option.JsonSerializerOptions.Converters.Add(new IntToStringConverter());
+               // option.JsonSerializerOptions.Converters.Add(new DecimalToStringConverter());
+            });
             IoCRegister.AddRepository(services);
             IoCRegister.AddServices(services);
             IoCRegister.AddDbContext(services, this.Configuration.GetConnectionString("DefaultConnection"));

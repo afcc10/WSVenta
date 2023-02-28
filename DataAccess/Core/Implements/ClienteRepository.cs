@@ -49,6 +49,7 @@ namespace DataAccess.Core.Implements
                 {
                     Id = x.Id,
                     Nombre = x.Nombre,
+                    Edad = x.Edad,
                 });
 
                 response = new()

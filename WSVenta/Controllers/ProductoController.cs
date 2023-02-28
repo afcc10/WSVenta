@@ -1,41 +1,38 @@
 ﻿using Business.Contract;
 using Common.Utilities.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Models.Request;
 using System.Net;
-using System;
 using System.Threading.Tasks;
+using System;
 
 namespace WSVenta.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
-    public class VentaController : ControllerBase
+    public class ProductoController : ControllerBase
     {
         #region Propierties
-        private readonly IVentaServices Service;
-        private readonly ILogger<VentaController> _logger;
+        private readonly IProductoServices Service;
+        private readonly ILogger<ProductoController> _logger;
         #endregion
 
         #region Constructor
-        public VentaController(IVentaServices service, ILogger<VentaController> logger)
+        public ProductoController(IProductoServices service, ILogger<ProductoController> logger)
         {
             Service = service;
             _logger = logger;
         }
         #endregion
 
-        [HttpPost]
-        public async Task<Response> Add(VentaRequest ventaRequest)
+        [HttpGet]
+        public async Task<Response> Get()
         {
             Response response = new();
             try
             {
-                response = await Service.add(ventaRequest);
+                response = await Service.get();
                 response.Exito = 200;
                 return response;
             }

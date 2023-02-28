@@ -12,6 +12,7 @@ namespace WSVenta.Models
 
         public long Id { get; set; }
         public string Nombre { get; set; }
+        public int Edad { get; set; }
 
         public virtual ICollection<Venta> Venta { get; set; }
     }
