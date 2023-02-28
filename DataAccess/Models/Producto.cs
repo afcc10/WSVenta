@@ -11,9 +11,10 @@ namespace WSVenta.Models
         }
 
         public long Id { get; set; }
-        public byte[] Nombre { get; set; }
+        public string Nombre { get; set; }
         public decimal PrecioUnitario { get; set; }
         public decimal Costo { get; set; }
+        public int CantidadInventario { get; set; }
 
         public virtual ICollection<Concepto> Conceptos { get; set; }
     }

@@ -15,13 +15,18 @@ namespace DependencyInjection
         public static IServiceCollection AddRepository(IServiceCollection services)
         {
             services.AddScoped<IClienteRepository, ClienteRepository>();
-
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IVentaRepository, VentaRepository>();
+            services.AddScoped<IProductoRepository, ProductoRepository>();
             return services;
         }
 
         public static IServiceCollection AddServices(IServiceCollection services)
         {
             services.AddScoped<IClienteServices, ClienteServices>();
+            services.AddScoped<IUserServices, UserServices>();
+            services.AddScoped<IVentaServices, VentaServices>();
+            services.AddScoped<IProductoServices, ProductoServices>();
             services.AddAutoMapper(typeof(ClienteProfileMap));
 
             return services;

@@ -43,12 +43,13 @@ namespace DataAccess.Core.Implements
             {
                 List<ClienteDto> list = new List<ClienteDto>();
 
-                var listCliente = context.Clientes.ToList();
+                var listCliente = context.Clientes.OrderByDescending(d=> d.Id).ToList();
 
                 list = listCliente.ConvertAll(x => new ClienteDto()
                 {
                     Id = x.Id,
                     Nombre = x.Nombre,
+                    Edad = x.Edad,
                 });
 
                 response = new()
